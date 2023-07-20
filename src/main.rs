@@ -1,5 +1,19 @@
 use kdam::tqdm;
-use ray_tracer_rs::{Point3, Ray, Vec3};
+mod ray;
+mod vec3;
+
+use ray::Ray;
+use vec3::Vec3;
+
+pub fn write_colors(color: Vec3) {
+    println!(
+        "{} {} {}",
+        (255.999 * color.x()) as i32,
+        (255.999 * color.y()) as i32,
+        (255.999 * color.z()) as i32
+    )
+}
+
 fn main() {
     // Image
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
@@ -11,7 +25,7 @@ fn main() {
     let viewport_width = ASPECT_RATIO * viewport_height;
     let focal_length = 1.0;
 
-    let origin = Point3::new(0.0, 0.0, 0.0);
+    let origin = Vec3::new(0.0, 0.0, 0.0);
     let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
     let vertical = Vec3::new(0.0, viewport_height, 0.0);
     let lower_left_corner =
@@ -27,7 +41,7 @@ fn main() {
                 lower_left_corner + horizontal * u + vertical * v - origin,
             );
             let color = r.ray_color();
-            color.write_colors();
+            write_colors(color);
         }
     }
 }

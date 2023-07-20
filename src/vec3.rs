@@ -19,6 +19,15 @@ impl Vec3 {
             z: z as f64,
         }
     }
+    pub fn x(self) -> f64 {
+        self.x
+    }
+    pub fn y(self) -> f64 {
+        self.y
+    }
+    pub fn z(self) -> f64 {
+        self.z
+    }
     pub fn zeros() -> Self {
         Self {
             x: 0.0,
@@ -128,6 +137,18 @@ impl ops::Div<f64> for Vec3 {
         }
     }
 }
+
+impl ops::Div<i32> for Vec3 {
+    type Output = Self;
+    fn div(self, rhs: i32) -> Self {
+        Self {
+            x: self.x / rhs as f64,
+            y: self.y / rhs as f64,
+            z: self.z / rhs as f64,
+        }
+    }
+}
+
 impl ops::AddAssign for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
