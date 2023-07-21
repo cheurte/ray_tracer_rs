@@ -19,6 +19,36 @@ impl Vec3 {
             z: z as f64,
         }
     }
+    pub fn X(reverse: bool) -> Self {
+        Self {
+            x: match reverse {
+                true => -1.0,
+                false => 1.0,
+            },
+            y: 0.0,
+            z: 0.0,
+        }
+    }
+    pub fn Y(reverse: bool) -> Self {
+        Self {
+            x: 0.0,
+            y: match reverse {
+                true => -1.0,
+                false => 1.0,
+            },
+            z: 0.0,
+        }
+    }
+    pub fn Z(reverse: bool) -> Self {
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: match reverse {
+                true => -1.0,
+                false => 1.0,
+            },
+        }
+    }
     pub fn x(self) -> f64 {
         self.x
     }
@@ -43,7 +73,7 @@ impl Vec3 {
         }
     }
 
-    fn length_squared(self) -> f64 {
+    pub fn length_squared(self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
