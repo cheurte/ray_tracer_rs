@@ -1,12 +1,13 @@
-use std::fmt;
-use std::ops;
+use std::{fmt, ops};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec3 {
     x: f64,
     y: f64,
     z: f64,
 }
+
+pub type Point3 = Vec3;
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
@@ -72,7 +73,6 @@ impl Vec3 {
             z: 1.0,
         }
     }
-
     pub fn length_squared(self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
