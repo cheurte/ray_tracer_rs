@@ -11,6 +11,7 @@ use kdam::tqdm;
 pub struct Camera {
     pub aspect_ratio: f64,
     pub image_width: i32,
+    pub samples_per_picxel: int,
     image_height: i32,
     pixel00_loc: Point3,
     pixel_delta_u: Vec3,
@@ -19,10 +20,11 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(aspect_ratio: f64, image_width: i32) -> Self {
+    pub fn new(aspect_ratio: f64, image_width: i32, samples_per_picxel: i32) -> Self {
         Self {
             aspect_ratio,
             image_width,
+            samples_per_picxel,
             image_height: 0,
             camera_center: Point3::zeros(),
             pixel00_loc: Point3::zeros(),
@@ -37,13 +39,8 @@ impl Camera {
 
         for j in tqdm!(0..self.image_height) {
             for i in 0..self.image_width {
-                let pixel_center = self.pixel00_loc
-                    + (self.pixel_delta_u * i as f64)
-                    + (self.pixel_delta_v * j as f64);
-                let ray_directon = pixel_center - self.camera_center;
-                let r: Ray = Ray::new(self.camera_center, ray_directon);
-
-                let pixel_color = Camera::ray_color(&r, &world);
+                let pixel_color = Color::zeros();
+                for sample in 0..sample_per_pixel {}
                 write_colors(pixel_color);
                 // pixel_color.write_colors()
             }
