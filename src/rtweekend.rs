@@ -1,3 +1,4 @@
+use crate::interval::Interval;
 use std::f64::INFINITY;
 
 pub const INF: f64 = INFINITY;

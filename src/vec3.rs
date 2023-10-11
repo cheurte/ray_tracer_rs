@@ -10,16 +10,10 @@ pub struct Vec3 {
 pub type Point3 = Vec3;
 
 impl Vec3 {
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
+    pub fn from(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
     }
-    pub fn from(x: i32, y: i32, z: i32) -> Self {
-        Self {
-            x: x as f64,
-            y: y as f64,
-            z: z as f64,
-        }
-    }
+
     pub fn X(reverse: bool) -> Self {
         Self {
             x: match reverse {
