@@ -1,11 +1,10 @@
-use rtweekend::random_double;
+use rtweekend::{random_double, random_double_interval};
 use vec3::Vec3;
 
 use crate::camera::Camera;
 use crate::color::Color;
 use crate::hittable_list::HittableList;
-use crate::material::{Lambertian, Materials, Metal};
-use crate::rtweekend::PI;
+use crate::material::Materials;
 use crate::sphere::Sphere;
 use crate::vec3::Point3;
 
@@ -39,21 +38,66 @@ fn main() {
                 b as f64 + 0.9 * random_double(),
             );
 
-            if (center - Point3::from(4.0, 0.2, 0.0)).length() > 0.9 {}
+            if (center - Point3::from(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    let albedo = Color::random() * Color::random();
+                    world.add(Box::new(Sphere::from(
+                        center,
+                        0.2,
+                        Materials::Lambertian(albedo),
+                    )));
+                }
+                if choose_mat < 0.95 {
+                    let albedo = Color::random_interval(0.5, 1.0);
+                    let fuzz = random_double_interval(0.0, 0.5);
+                    world.add(Box::new(Sphere::from(
+                        center,
+                        0.2,
+                        Materials::Metal(albedo, fuzz),
+                    )));
+                } else {
+                    world.add(Box::new(Sphere::from(
+                        center,
+                        0.2,
+                        Materials::Dielectric(1.5),
+                    )));
+                }
+            }
         }
     }
 
+    let material1 = Materials::Dielectric(1.5);
+    world.add(Box::new(Sphere::from(
+        Point3::from(0.0, 1.0, 0.0),
+        1.0,
+        material1,
+    )));
+
+    let material2 = Materials::Lambertian(Color::from(0.4, 0.2, 0.1));
+    world.add(Box::new(Sphere::from(
+        Point3::from(-4.0, 1.0, 0.0),
+        1.0,
+        material2,
+    )));
+
+    let material3 = Materials::Metal(Color::from(0.7, 0.6, 0.5), 0.0);
+    world.add(Box::new(Sphere::from(
+        Point3::from(4.0, 1.0, 0.0),
+        1.0,
+        material3,
+    )));
+
     let mut cam = Camera::new(
         16.0 / 9.0,
-        400,
-        100,
+        1200,
+        500,
         50,
         20,
-        Point3::from(-2.0, 2.0, 1.0),
-        Point3::from(0.0, 0.0, -1.0),
+        Point3::from(13.0, 2.0, 3.0),
+        Point3::from(0.0, 0.0, 0.0),
         Vec3::from(0.0, 1.0, 0.0),
+        0.6,
         10.0,
-        3.4,
     );
 
     cam.render(&world);
