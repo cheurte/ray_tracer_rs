@@ -1,5 +1,6 @@
 use crate::hittable::{HitRecord, Hittable};
 use crate::interval::Interval;
+
 pub struct HittableList {
     objects: Vec<Box<dyn Hittable>>,
 }

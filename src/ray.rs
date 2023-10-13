@@ -8,7 +8,13 @@ pub struct Ray {
 }
 
 impl Ray {
-    pub fn new(origin: Point3, direction: Vec3) -> Self {
+    pub fn new() -> Self {
+        Self {
+            origin: Point3::zeros(),
+            direction: Vec3::zeros(),
+        }
+    }
+    pub fn from(origin: Point3, direction: Vec3) -> Self {
         Self { origin, direction }
     }
     pub fn origin(self) -> Point3 {

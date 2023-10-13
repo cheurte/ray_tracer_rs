@@ -1,4 +1,6 @@
+use crate::color::Color;
 use crate::interval::Interval;
+use crate::material::Materials;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
@@ -6,6 +8,8 @@ use crate::vec3::{Point3, Vec3};
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
+    pub mat: Materials,
+    pub color: Color,
     pub t: f64,
     pub front_face: bool,
 }
@@ -15,8 +19,10 @@ impl HitRecord {
         Self {
             p: Point3::zeros(),
             normal: Vec3::zeros(),
+            mat: Materials::Metal(Color::zeros(), 0.0),
             t: 0.0,
             front_face: false,
+            color: Color::zeros(),
         }
     }
     pub fn set_face_normal(&mut self, r: &Ray, outward_normal: &Vec3) {
