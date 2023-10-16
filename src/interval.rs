@@ -14,8 +14,15 @@ impl Interval {
         }
     }
 
-    pub const fn from(min: f64, max: f64) -> Self {
+    pub fn from(min: f64, max: f64) -> Self {
         Self { min, max }
+    }
+
+    pub fn from_intervals(a: Interval, b: Interval) -> Self {
+        Self {
+            min: a.min().min(b.min()),
+            max: a.max().max(b.max()),
+        }
     }
 
     pub fn contains(self, x: f64) -> bool {
@@ -38,6 +45,22 @@ impl Interval {
     }
     pub fn min(self) -> f64 {
         self.min
+    }
+    pub fn size(self) -> f64 {
+        self.max - self.min
+    }
+    pub fn modify_min(&mut self, value: f64) {
+        self.min = value;
+    }
+    pub fn modify_max(&mut self, value: f64) {
+        self.max = value;
+    }
+    pub fn expand(self, delta: f64) -> Self {
+        let padding = delta / 2.0;
+        Self {
+            min: self.min - padding,
+            max: self.max - padding,
+        }
     }
 }
 

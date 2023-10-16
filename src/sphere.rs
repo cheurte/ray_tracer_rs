@@ -1,3 +1,4 @@
+use crate::aabb::Aabb;
 use crate::hittable::{HitRecord, Hittable};
 use crate::interval::Interval;
 use crate::material::Materials;
@@ -11,15 +12,27 @@ pub struct Sphere {
     mat: Materials,
     is_moving: bool,
     center_vec: Vec3,
+    bbox: Aabb,
 }
 
 impl Sphere {
+    pub fn new() -> Self {
+        Self {
+            center: Point3::zeros(),
+            radius: 0.0,
+            mat: Materials::Metal(Vec3::zeros(), 0.0),
+            is_moving: false,
+            center_vec: Vec3::zeros(),
+            bbox: Aabb::new(),
+        }
+    }
     pub fn from(
         center: Point3,
         radius: f64,
         mat: Materials,
         center_vec: Vec3,
         is_moving: bool,
+        bbox: Aabb,
     ) -> Self {
         Self {
             center,
@@ -27,24 +40,32 @@ impl Sphere {
             mat,
             is_moving,
             center_vec,
+            bbox,
         }
     }
     pub fn new_stationnary(center: Point3, radius: f64, mat: Materials) -> Self {
+        let rvec = Vec3::from(radius, radius, radius);
+        let bbox = Aabb::from_points(center - rvec, center + rvec);
         Self {
             center,
             radius,
             mat,
             is_moving: false,
             center_vec: Vec3::zeros(),
+            bbox,
         }
     }
     pub fn new_moving(center1: Point3, center2: Point3, radius: f64, mat: Materials) -> Self {
+        let rvec = Vec3::from(radius, radius, radius);
+        let box1 = Aabb::from_points(center1 - rvec, center2 + rvec);
+        let box2 = Aabb::from_points(center2 - rvec, center1 + rvec);
         Self {
             center: center1,
             radius,
             mat,
             is_moving: true,
             center_vec: (center2 - center1),
+            bbox: Aabb::from_bbox(box1, box2),
         }
     }
     fn sphere_center(self, time: f64) -> Point3 {
@@ -86,5 +107,8 @@ impl Hittable for Sphere {
         rec.mat = self.mat;
         // rec.color = self.color;
         true
+    }
+    fn bounding_box(&self) -> Aabb {
+        self.bbox
     }
 }

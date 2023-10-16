@@ -8,6 +8,8 @@ use crate::material::Materials;
 use crate::sphere::Sphere;
 use crate::vec3::Point3;
 
+mod aabb;
+mod bvh;
 mod camera;
 mod color;
 mod hittable;

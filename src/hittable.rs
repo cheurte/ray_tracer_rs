@@ -1,3 +1,4 @@
+use crate::aabb::Aabb;
 use crate::color::Color;
 use crate::interval::Interval;
 use crate::material::Materials;
@@ -36,4 +37,6 @@ impl HitRecord {
 
 pub trait Hittable {
     fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool;
+
+    fn bounding_box(&self) -> Aabb;
 }
