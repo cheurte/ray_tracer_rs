@@ -23,7 +23,7 @@ fn main() {
     let mut world = HittableList::new();
 
     let ground_material = Materials::Lambertian(Color::from(0.5, 0.5, 0.5));
-    world.add(Box::new(Sphere::from(
+    world.add(Box::new(Sphere::new_stationnary(
         Point3::from(0.0, -1000.0, 0.0),
         1000.0,
         ground_material,
@@ -41,8 +41,10 @@ fn main() {
             if (center - Point3::from(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
                     let albedo = Color::random() * Color::random();
-                    world.add(Box::new(Sphere::from(
+                    let center2 = center + Vec3::from(0.0, random_double_interval(0.0, 0.5), 0.0);
+                    world.add(Box::new(Sphere::new_moving(
                         center,
+                        center2,
                         0.2,
                         Materials::Lambertian(albedo),
                     )));
@@ -50,13 +52,15 @@ fn main() {
                 if choose_mat < 0.95 {
                     let albedo = Color::random_interval(0.5, 1.0);
                     let fuzz = random_double_interval(0.0, 0.5);
-                    world.add(Box::new(Sphere::from(
+                    let center2 = center + Vec3::from(0.0, random_double_interval(0.0, 0.5), 0.0);
+                    world.add(Box::new(Sphere::new_moving(
                         center,
+                        center2,
                         0.2,
                         Materials::Metal(albedo, fuzz),
                     )));
                 } else {
-                    world.add(Box::new(Sphere::from(
+                    world.add(Box::new(Sphere::new_stationnary(
                         center,
                         0.2,
                         Materials::Dielectric(1.5),
@@ -67,21 +71,21 @@ fn main() {
     }
 
     let material1 = Materials::Dielectric(1.5);
-    world.add(Box::new(Sphere::from(
+    world.add(Box::new(Sphere::new_stationnary(
         Point3::from(0.0, 1.0, 0.0),
         1.0,
         material1,
     )));
 
     let material2 = Materials::Lambertian(Color::from(0.4, 0.2, 0.1));
-    world.add(Box::new(Sphere::from(
+    world.add(Box::new(Sphere::new_stationnary(
         Point3::from(-4.0, 1.0, 0.0),
         1.0,
         material2,
     )));
 
     let material3 = Materials::Metal(Color::from(0.7, 0.6, 0.5), 0.0);
-    world.add(Box::new(Sphere::from(
+    world.add(Box::new(Sphere::new_stationnary(
         Point3::from(4.0, 1.0, 0.0),
         1.0,
         material3,
@@ -89,14 +93,14 @@ fn main() {
 
     let mut cam = Camera::new(
         16.0 / 9.0,
-        1200,
-        500,
+        400,
+        50,
         50,
         20,
         Point3::from(13.0, 2.0, 3.0),
         Point3::from(0.0, 0.0, 0.0),
         Vec3::from(0.0, 1.0, 0.0),
-        0.6,
+        0.02,
         10.0,
     );
 
