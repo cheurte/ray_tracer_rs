@@ -1,16 +1,17 @@
+use std::rc::Rc;
+
 use crate::aabb::Aabb;
 use crate::color::Color;
 use crate::interval::Interval;
-use crate::material::Materials;
+use crate::material::{Material, Metal};
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
-#[derive(Debug, Clone, Copy)]
+// #[derive(Debug, Clone, Copy)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub mat: Materials,
-    pub color: Color,
+    pub mat: Rc<dyn Material>,
     pub t: f64,
     pub front_face: bool,
 }
@@ -20,10 +21,10 @@ impl HitRecord {
         Self {
             p: Point3::zeros(),
             normal: Vec3::zeros(),
-            mat: Materials::Metal(Color::zeros(), 0.0),
+            mat: Rc::new(Metal::new(Color::zeros(), 0.0)),
             t: 0.0,
             front_face: false,
-            color: Color::zeros(),
+            // color: Color::zeros(),
         }
     }
     pub fn set_face_normal(&mut self, r: &Ray, outward_normal: &Vec3) {

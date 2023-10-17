@@ -14,7 +14,7 @@ impl Interval {
         }
     }
 
-    pub fn from(min: f64, max: f64) -> Self {
+    pub const fn from(min: f64, max: f64) -> Self {
         Self { min, max }
     }
 

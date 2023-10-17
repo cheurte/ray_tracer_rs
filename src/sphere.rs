@@ -1,15 +1,20 @@
+use std::rc::Rc;
+
 use crate::aabb::Aabb;
 use crate::hittable::{HitRecord, Hittable};
 use crate::interval::Interval;
-use crate::material::Materials;
+use crate::material::{Material, Metal};
+// use crate::material::Materials;
+use crate::color::Color;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
-#[derive(Debug, Clone, Copy)]
+// #[derive(Debug, Clone, Copy)]
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    mat: Materials,
+    // mat: Materials,
+    mat: Rc<dyn Material>,
     is_moving: bool,
     center_vec: Vec3,
     bbox: Aabb,
@@ -20,7 +25,7 @@ impl Sphere {
         Self {
             center: Point3::zeros(),
             radius: 0.0,
-            mat: Materials::Metal(Vec3::zeros(), 0.0),
+            mat: Rc::new(Metal::new(Color::zeros(), 1.5)),
             is_moving: false,
             center_vec: Vec3::zeros(),
             bbox: Aabb::new(),
@@ -29,7 +34,7 @@ impl Sphere {
     pub fn from(
         center: Point3,
         radius: f64,
-        mat: Materials,
+        mat: Rc<dyn Material>,
         center_vec: Vec3,
         is_moving: bool,
         bbox: Aabb,
@@ -43,7 +48,7 @@ impl Sphere {
             bbox,
         }
     }
-    pub fn new_stationnary(center: Point3, radius: f64, mat: Materials) -> Self {
+    pub fn new_stationnary(center: Point3, radius: f64, mat: Rc<dyn Material>) -> Self {
         let rvec = Vec3::from(radius, radius, radius);
         let bbox = Aabb::from_points(center - rvec, center + rvec);
         Self {
@@ -55,7 +60,12 @@ impl Sphere {
             bbox,
         }
     }
-    pub fn new_moving(center1: Point3, center2: Point3, radius: f64, mat: Materials) -> Self {
+    pub fn new_moving(
+        center1: Point3,
+        center2: Point3,
+        radius: f64,
+        mat: Rc<dyn Material>,
+    ) -> Self {
         let rvec = Vec3::from(radius, radius, radius);
         let box1 = Aabb::from_points(center1 - rvec, center2 + rvec);
         let box2 = Aabb::from_points(center2 - rvec, center1 + rvec);
@@ -68,7 +78,7 @@ impl Sphere {
             bbox: Aabb::from_bbox(box1, box2),
         }
     }
-    fn sphere_center(self, time: f64) -> Point3 {
+    fn sphere_center(&self, time: f64) -> Point3 {
         self.center + self.center_vec * time
     }
 }
@@ -104,7 +114,7 @@ impl Hittable for Sphere {
         let outward_normal = (rec.p - center) / self.radius;
         // rec.normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, &outward_normal);
-        rec.mat = self.mat;
+        rec.mat = self.mat.clone();
         // rec.color = self.color;
         true
     }

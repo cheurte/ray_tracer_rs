@@ -12,16 +12,8 @@ pub trait Material {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum Materials {
-    Lambertian(Color),
-    Metal(Color, f64),
-    Dielectric(f64),
-}
-
-#[derive(Debug, Clone, Copy)]
 pub struct Lambertian {
     albedo: Color,
-    // fuzz: f64,
 }
 
 impl Lambertian {

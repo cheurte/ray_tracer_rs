@@ -1,7 +1,7 @@
 use crate::color::{write_colors, Color};
 use crate::hittable::{HitRecord, Hittable};
 use crate::interval::Interval;
-use crate::material::{Dielectric, Lambertian, Material, Materials, Metal};
+use crate::material::{Dielectric, Lambertian, Material, Metal};
 use crate::ray::Ray;
 use crate::rtweekend::{degrees2radians, random_double, INF};
 use crate::vec3::{Point3, Vec3};
@@ -139,12 +139,13 @@ impl Camera {
         if world.hit(r, Interval::from(0.001, INF), &mut rec) {
             let mut scattered = Ray::new();
             let mut attenuation = Color::ones();
-            let material: Box<dyn Material> = match rec.mat {
-                Materials::Lambertian(color) => Box::new(Lambertian::new(color)),
-                Materials::Metal(color, fuzz) => Box::new(Metal::new(color, fuzz)),
-                Materials::Dielectric(ir) => Box::new(Dielectric::new(ir)),
-            };
-            if material.scatter(r, &rec, &mut attenuation, &mut scattered) {
+            // let material: Box<dyn Material> = match rec.mat {
+            //     ::Lambertian(color) => Box::new(Lambertian::new(color)),
+            //     Materials::Metal(color, fuzz) => Box::new(Metal::new(color, fuzz)),
+            //     Materials::Dielectric(ir) => Box::new(Dielectric::new(ir)),
+            // };
+
+            if rec.mat.scatter(r, &rec, &mut attenuation, &mut scattered) {
                 return attenuation * Camera::ray_color(&scattered, depth - 1, world);
             }
             return Color::zeros();

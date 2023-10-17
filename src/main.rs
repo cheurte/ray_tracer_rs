@@ -1,12 +1,14 @@
-use rtweekend::{random_double, random_double_interval};
-use vec3::Vec3;
+use std::rc::Rc;
 
 use crate::camera::Camera;
 use crate::color::Color;
 use crate::hittable_list::HittableList;
-use crate::material::Materials;
+use crate::material::{Dielectric, Lambertian, Metal};
 use crate::sphere::Sphere;
 use crate::vec3::Point3;
+use bvh::BvhNode;
+use rtweekend::{random_double, random_double_interval};
+use vec3::Vec3;
 
 mod aabb;
 mod bvh;
@@ -24,11 +26,11 @@ mod vec3;
 fn main() {
     let mut world = HittableList::new();
 
-    let ground_material = Materials::Lambertian(Color::from(0.5, 0.5, 0.5));
-    world.add(Box::new(Sphere::new_stationnary(
+    let ground_material = Lambertian::new(Color::from(0.5, 0.5, 0.5));
+    world.add(Rc::new(Sphere::new_stationnary(
         Point3::from(0.0, -1000.0, 0.0),
         1000.0,
-        ground_material,
+        Rc::new(ground_material),
     )));
 
     for a in -11..11 {
@@ -44,54 +46,56 @@ fn main() {
                 if choose_mat < 0.8 {
                     let albedo = Color::random() * Color::random();
                     let center2 = center + Vec3::from(0.0, random_double_interval(0.0, 0.5), 0.0);
-                    world.add(Box::new(Sphere::new_moving(
+                    world.add(Rc::new(Sphere::new_moving(
                         center,
                         center2,
                         0.2,
-                        Materials::Lambertian(albedo),
+                        Rc::new(Lambertian::new(albedo)),
                     )));
                 }
                 if choose_mat < 0.95 {
                     let albedo = Color::random_interval(0.5, 1.0);
                     let fuzz = random_double_interval(0.0, 0.5);
                     let center2 = center + Vec3::from(0.0, random_double_interval(0.0, 0.5), 0.0);
-                    world.add(Box::new(Sphere::new_moving(
+                    world.add(Rc::new(Sphere::new_moving(
                         center,
                         center2,
                         0.2,
-                        Materials::Metal(albedo, fuzz),
+                        Rc::new(Metal::new(albedo, fuzz)),
                     )));
                 } else {
-                    world.add(Box::new(Sphere::new_stationnary(
+                    world.add(Rc::new(Sphere::new_stationnary(
                         center,
                         0.2,
-                        Materials::Dielectric(1.5),
+                        Rc::new(Dielectric::new(1.5)),
                     )));
                 }
             }
         }
     }
 
-    let material1 = Materials::Dielectric(1.5);
-    world.add(Box::new(Sphere::new_stationnary(
+    let material1 = Rc::new(Dielectric::new(1.5));
+    world.add(Rc::new(Sphere::new_stationnary(
         Point3::from(0.0, 1.0, 0.0),
         1.0,
         material1,
     )));
 
-    let material2 = Materials::Lambertian(Color::from(0.4, 0.2, 0.1));
-    world.add(Box::new(Sphere::new_stationnary(
+    let material2 = Rc::new(Lambertian::new(Color::from(0.4, 0.2, 0.1)));
+    world.add(Rc::new(Sphere::new_stationnary(
         Point3::from(-4.0, 1.0, 0.0),
         1.0,
         material2,
     )));
 
-    let material3 = Materials::Metal(Color::from(0.7, 0.6, 0.5), 0.0);
-    world.add(Box::new(Sphere::new_stationnary(
+    let material3 = Rc::new(Metal::new(Color::from(0.7, 0.6, 0.5), 0.0));
+    world.add(Rc::new(Sphere::new_stationnary(
         Point3::from(4.0, 1.0, 0.0),
         1.0,
         material3,
     )));
+
+    world = HittableList::from(Rc::new(BvhNode::from_list(&mut world)));
 
     let mut cam = Camera::new(
         16.0 / 9.0,
