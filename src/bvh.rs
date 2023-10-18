@@ -84,10 +84,6 @@ impl BvhNode {
         }
     }
     fn box_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>, axis_index: i32) -> Ordering {
-        // a.bounding_box().axis(axis_index).min() < b.bounding_box().axis(axis_index).max()
-        // let a_bbox = a.bounding_box();
-        // let b_bbox = b.bounding_box();
-
         a.bounding_box()
             .axis(axis_index)
             .min()

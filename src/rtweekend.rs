@@ -1,7 +1,6 @@
-use std::f64::INFINITY;
+use std::f64::{consts::PI, INFINITY};
 
 pub const INF: f64 = INFINITY;
-pub const PI: f64 = 3.1415926535897932385;
 pub const RAND_MAX: i32 = 0;
 
 pub fn degrees2radians(degrees: f64) -> f64 {

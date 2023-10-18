@@ -1,4 +1,4 @@
-use crate::{hittable::Hittable, interval::Interval, ray::Ray, vec3::Point3};
+use crate::{interval::Interval, ray::Ray, vec3::Point3};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Aabb {
@@ -15,9 +15,9 @@ impl Aabb {
             z: Interval::new(),
         }
     }
-    pub fn from(x: Interval, y: Interval, z: Interval) -> Self {
-        Self { x, y, z }
-    }
+    // pub fn from(x: Interval, y: Interval, z: Interval) -> Self {
+    //     Self { x, y, z }
+    // }
     pub fn from_points(a: Point3, b: Point3) -> Self {
         Self {
             x: Interval::from((a[0] as f64).min(b[0]), (a[0] as f64).max(b[0])),
@@ -50,13 +50,13 @@ impl Aabb {
     }
     pub fn hit(&self, r: &Ray, ray_t: &mut Interval) -> bool {
         for a in 0..3 {
-            let invD = 1.0 / r.direction()[a];
+            let inv_d = 1.0 / r.direction()[a];
             let orig = r.origin()[a];
 
-            let mut t0 = (self.axis(a).min() - orig) * invD;
-            let mut t1 = (self.axis(a).max() - orig) * invD;
+            let mut t0 = (self.axis(a).min() - orig) * inv_d;
+            let mut t1 = (self.axis(a).max() - orig) * inv_d;
 
-            if invD < 0.0 {
+            if inv_d < 0.0 {
                 let save = t0;
                 t0 = t1;
                 t1 = save;

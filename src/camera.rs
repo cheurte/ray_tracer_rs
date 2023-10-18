@@ -70,7 +70,7 @@ impl Camera {
 
     pub fn render<T: Hittable>(&mut self, world: &T) {
         self.initialize();
-        println!("P3\n{} {}\n255", self.image_width, self.image_height);
+        // println!("P3\n{} {}\n255", self.image_width, self.image_height);
 
         for j in tqdm!(0..self.image_height) {
             for i in 0..self.image_width {
@@ -178,5 +178,32 @@ impl Camera {
     fn defocus_disk_sample(&self) -> Point3 {
         let p = Vec3::random_in_unit_disk();
         self.camera_center + (self.defocus_disk_u * p[0]) + (self.defocus_disk_v * p[1])
+    }
+}
+
+impl Default for Camera {
+    fn default() -> Self {
+        Self {
+            aspect_ratio: 16.0 / 9.0,
+            image_width: 400,
+            samples_per_pixel: 100,
+            max_depth: 50,
+            vfov: 20,
+            lookfrom: Point3::from(13.0, 2.0, 3.0),
+            lookat: Point3::from(0.0, 0.0, 0.0),
+            vup: Vec3::Y(false),
+            defocus_angle: 0.0,
+            focus_dist: 10.0,
+            image_height: 0,
+            pixel00_loc: Point3::zeros(),
+            pixel_delta_u: Point3::zeros(),
+            pixel_delta_v: Point3::zeros(),
+            camera_center: Point3::zeros(),
+            u: Vec3::zeros(),
+            v: Vec3::zeros(),
+            w: Vec3::zeros(),
+            defocus_disk_u: Vec3::zeros(),
+            defocus_disk_v: Vec3::zeros(),
+        }
     }
 }
