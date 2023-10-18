@@ -100,22 +100,22 @@ impl Texture for ImageTexture {
         let u = Interval::from(0.0, 1.0).clamp(u);
         let v = 1.0 - Interval::from(0.0, 1.0).clamp(v);
 
-        let i = u * self.image.width() as f64;
-        let j = v * self.image.height() as f64;
+        let i = (u * self.image.width() as f64) as u32;
+        let j = (v * self.image.height() as f64) as u32;
 
         let bindings = self.image.to_rgb8();
         let pixel = bindings
             .get_pixel_checked(
-                // i,
-                // j,
-                ImageTexture::clamp(i as u32, 0, self.image.width()),
-                ImageTexture::clamp(j as u32, 0, self.image.height()),
+                i,
+                j,
+                // ImageTexture::clamp(i, 0, self.image.width()),
+                // ImageTexture::clamp(j, 0, self.image.height()),
             )
             .unwrap_or(Rgb::from_slice(&[255, 0, 255]));
-        println!(
-            "u: {}, v: {}, i: {}, j: {}, pixel value : {:?}",
-            u, v, i, j, pixel
-        );
+        // println!(
+        //     "u: {}, v: {}, i: {}, j: {}, pixel value : {:?}",
+        //     u, v, i, j, pixel.0
+        // );
         let color_scale = 1.0 / 255.0;
         Color::from(
             color_scale * pixel.0[0] as f64,

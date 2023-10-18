@@ -70,7 +70,7 @@ impl Camera {
 
     pub fn render<T: Hittable>(&mut self, world: &T) {
         self.initialize();
-        // println!("P3\n{} {}\n255", self.image_width, self.image_height);
+        println!("P3\n{} {}\n255", self.image_width, self.image_height);
 
         for j in tqdm!(0..self.image_height) {
             for i in 0..self.image_width {
@@ -94,11 +94,6 @@ impl Camera {
         };
 
         self.camera_center = self.lookfrom;
-        // self.camera_center = Vec3::zeros();
-        // Determine viewport dimensions.
-        // let focal_lenght = (self.lookfrom - self.lookat).length();
-        // println!("{focal_lenght}");
-        // let focal_lenght = 1.0;
         let theta = degrees2radians(self.vfov as f64);
         let height = (theta / 2.0).tan();
         let viewport_height = 2.0 * height * self.focus_dist as f64;

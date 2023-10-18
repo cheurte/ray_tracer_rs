@@ -149,7 +149,7 @@ fn two_sphere() {
 }
 
 fn earth() -> Result<(), Box<dyn error::Error>> {
-    let earth_texture = Rc::new(ImageTexture::from("earthmap.jpg")?);
+    let earth_texture = Rc::new(ImageTexture::from("earthmap2.jpg")?);
     let earth_surface = Rc::new(Lambertian::from_texture(earth_texture));
     let globe = Rc::new(Sphere::new_stationnary(Point3::zeros(), 2.0, earth_surface));
 

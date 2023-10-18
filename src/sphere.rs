@@ -82,7 +82,7 @@ impl Sphere {
     fn sphere_center(&self, time: f64) -> Point3 {
         self.center + self.center_vec * time
     }
-    fn get_sphere_uv(p: &Point3, mut u: f64, mut v: f64) {
+    fn get_sphere_uv(p: &Point3) -> (f64, f64) {
         // p: a given point on the sphere of radius one, centered at the origin.
         // u: returned value [0,1] of angle around the Y axis from X=-1.
         // v: returned value [0,1] of angle from Y=-1 to Y=+1.
@@ -92,8 +92,7 @@ impl Sphere {
         let theta = -p.y().acos();
         let phi = -p.z().atan2(p.x()) + PI;
 
-        u = phi / (2.0 * PI);
-        v = theta / PI;
+        (phi / (2.0 * PI), theta / PI)
     }
 }
 
@@ -128,7 +127,7 @@ impl Hittable for Sphere {
         let outward_normal = (rec.p - center) / self.radius;
         // rec.normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, &outward_normal);
-        Sphere::get_sphere_uv(&outward_normal, rec.u, rec.v);
+        (rec.u, rec.v) = Sphere::get_sphere_uv(&outward_normal);
         rec.mat = self.mat.clone();
         // rec.color = self.color;
         true
