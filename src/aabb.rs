@@ -15,9 +15,22 @@ impl Aabb {
             z: Interval::new(),
         }
     }
-    // pub fn from(x: Interval, y: Interval, z: Interval) -> Self {
-    //     Self { x, y, z }
-    // }
+    pub fn pad(&self) -> Self {
+        let delta = 0.0001;
+        let x = match self.x().size() >= delta {
+            true => self.x,
+            false => self.x.expand(delta),
+        };
+        let y = match self.y().size() >= delta {
+            true => self.y,
+            false => self.y.expand(delta),
+        };
+        let z = match self.z().size() >= delta {
+            true => self.z,
+            false => self.z.expand(delta),
+        };
+        Self { x, y, z }
+    }
     pub fn from_points(a: Point3, b: Point3) -> Self {
         Self {
             x: Interval::from((a[0] as f64).min(b[0]), (a[0] as f64).max(b[0])),

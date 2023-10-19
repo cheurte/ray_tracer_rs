@@ -9,8 +9,9 @@ use crate::sphere::Sphere;
 use crate::texture::CheckerTexture;
 use crate::vec3::Point3;
 use bvh::BvhNode;
+use quad::Quad;
 use rtweekend::{random_double, random_double_interval};
-use texture::ImageTexture;
+use texture::{ImageTexture, NoiseTexture};
 use vec3::Vec3;
 
 mod aabb;
@@ -21,8 +22,9 @@ mod hittable;
 mod hittable_list;
 mod interval;
 mod material;
+mod perlin;
+mod quad;
 mod ray;
-mod rtw_stb_image;
 mod rtweekend;
 mod sphere;
 mod texture;
@@ -149,7 +151,7 @@ fn two_sphere() {
 }
 
 fn earth() -> Result<(), Box<dyn error::Error>> {
-    let earth_texture = Rc::new(ImageTexture::from("earthmap2.jpg")?);
+    let earth_texture = Rc::new(ImageTexture::from("earthmap.jpg")?);
     let earth_surface = Rc::new(Lambertian::from_texture(earth_texture));
     let globe = Rc::new(Sphere::new_stationnary(Point3::zeros(), 2.0, earth_surface));
 
@@ -170,7 +172,94 @@ fn earth() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
+fn two_perlin_noise() {
+    let mut world = HittableList::new();
+
+    let pertext = Rc::new(NoiseTexture::from(256, 4.0));
+    world.add(Rc::new(Sphere::new_stationnary(
+        Point3::from(0.0, -1000.0, 0.0),
+        1000.0,
+        Rc::new(Lambertian::from_texture(pertext.clone())),
+    )));
+    world.add(Rc::new(Sphere::new_stationnary(
+        Point3::from(0.0, 2.0, 0.0),
+        2.0,
+        Rc::new(Lambertian::from_texture(pertext)),
+    )));
+    let mut cam = Camera::new(
+        16.0 / 9.0,
+        400,
+        100,
+        50,
+        20,
+        Point3::from(13.0, 2.0, 3.0),
+        Point3::from(0.0, 0.0, 0.0),
+        Vec3::from(0.0, 1.0, 0.0),
+        0.00,
+        10.0,
+    );
+
+    cam.render(&world);
+}
+
+fn quads() {
+    let mut world = HittableList::new();
+
+    //Materials
+    let left_red = Rc::new(Lambertian::from_color(Color::from(1.0, 0.2, 0.2)));
+    let back_green = Rc::new(Lambertian::from_color(Color::from(0.2, 1.0, 0.2)));
+    let right_blue = Rc::new(Lambertian::from_color(Color::from(0.2, 0.2, 1.0)));
+    let upper_orange = Rc::new(Lambertian::from_color(Color::from(1.0, 0.5, 0.0)));
+    let lower_teal = Rc::new(Lambertian::from_color(Color::from(0.2, 0.8, 0.8)));
+
+    world.add(Rc::new(Quad::from(
+        Point3::from(-3.0, -2.0, 5.0),
+        Vec3::from(0.0, 0.0, -4.0),
+        Vec3::from(0.0, 4.0, 0.0),
+        left_red,
+    )));
+    world.add(Rc::new(Quad::from(
+        Point3::from(-2.0, -2.0, 0.0),
+        Vec3::from(4.0, 0.0, 0.0),
+        Vec3::from(0.0, 4.0, 0.0),
+        back_green,
+    )));
+    world.add(Rc::new(Quad::from(
+        Point3::from(3.0, -2.0, 1.0),
+        Vec3::from(0.0, 0.0, 4.0),
+        Vec3::from(0.0, 4.0, 0.0),
+        right_blue,
+    )));
+    world.add(Rc::new(Quad::from(
+        Point3::from(-2.0, 3.0, 1.0),
+        Vec3::from(4.0, 0.0, 0.0),
+        Vec3::from(0.0, 0.0, 4.0),
+        upper_orange,
+    )));
+    world.add(Rc::new(Quad::from(
+        Point3::from(-2.0, -3.0, 5.0),
+        Vec3::from(4.0, 0.0, 0.0),
+        Vec3::from(0.0, 0.0, -4.0),
+        lower_teal,
+    )));
+
+    let mut cam = Camera::new(
+        1.0,
+        400,
+        1000,
+        50,
+        80,
+        Point3::from(0.0, 0.0, 9.0),
+        Point3::from(0.0, 0.0, 0.0),
+        Vec3::from(0.0, 1.0, 0.0),
+        0.0,
+        10.0,
+    );
+    cam.render(&world);
+}
 fn main() {
-    earth();
+    // earth();
     // two_sphere();
+    // two_perlin_noise();
+    quads();
 }

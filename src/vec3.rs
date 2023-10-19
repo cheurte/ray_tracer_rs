@@ -239,11 +239,18 @@ impl ops::AddAssign for Vec3 {
         self.z += rhs.z;
     }
 }
-impl ops::MulAssign for Vec3 {
+impl ops::MulAssign<Vec3> for Vec3 {
     fn mul_assign(&mut self, rhs: Self) {
         self.x *= rhs.x;
         self.y *= rhs.y;
         self.z *= rhs.z;
+    }
+}
+impl ops::MulAssign<f64> for Vec3 {
+    fn mul_assign(&mut self, rhs: f64) {
+        self.x *= rhs;
+        self.y *= rhs;
+        self.z *= rhs;
     }
 }
 impl ops::SubAssign for Vec3 {

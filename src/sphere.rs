@@ -2,11 +2,10 @@ use std::f64::consts::PI;
 use std::rc::Rc;
 
 use crate::aabb::Aabb;
+use crate::color::Color;
 use crate::hittable::{HitRecord, Hittable};
 use crate::interval::Interval;
 use crate::material::{Material, Metal};
-// use crate::material::Materials;
-use crate::color::Color;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
@@ -14,7 +13,6 @@ use crate::vec3::{Point3, Vec3};
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    // mat: Materials,
     mat: Rc<dyn Material>,
     is_moving: bool,
     center_vec: Vec3,
@@ -89,8 +87,8 @@ impl Sphere {
         //     <1 0 0> yields <0.50 0.50>       <-1  0  0> yields <0.00 0.50>
         //     <0 1 0> yields <0.50 1.00>       < 0 -1  0> yields <0.50 0.00>
         //     <0 0 1> yields <0.25 0.50>       < 0  0 -1> yields <0.75 0.50>
-        let theta = -p.y().acos();
-        let phi = -p.z().atan2(p.x()) + PI;
+        let theta = (*p * -1.0).y().acos();
+        let phi = (*p * -1.0).z().atan2(p.x()) + PI;
 
         (phi / (2.0 * PI), theta / PI)
     }
@@ -129,7 +127,6 @@ impl Hittable for Sphere {
         rec.set_face_normal(r, &outward_normal);
         (rec.u, rec.v) = Sphere::get_sphere_uv(&outward_normal);
         rec.mat = self.mat.clone();
-        // rec.color = self.color;
         true
     }
     fn bounding_box(&self) -> Aabb {

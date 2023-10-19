@@ -1,6 +1,6 @@
-use image::{io::Reader as ImageReader, DynamicImage, GenericImageView, Pixel, Rgb};
+use image::{io::Reader as ImageReader, DynamicImage, Pixel, Rgb};
 
-use crate::{color::Color, interval::Interval, vec3::Point3};
+use crate::{color::Color, interval::Interval, perlin::Perlin, vec3::Point3};
 use std::{error, rc::Rc};
 
 pub trait Texture {
@@ -106,21 +106,54 @@ impl Texture for ImageTexture {
         let bindings = self.image.to_rgb8();
         let pixel = bindings
             .get_pixel_checked(
-                i,
-                j,
-                // ImageTexture::clamp(i, 0, self.image.width()),
-                // ImageTexture::clamp(j, 0, self.image.height()),
+                // i,
+                // j,
+                ImageTexture::clamp(i, 0, self.image.width()),
+                ImageTexture::clamp(j, 0, self.image.height()),
             )
             .unwrap_or(Rgb::from_slice(&[255, 0, 255]));
-        // println!(
-        //     "u: {}, v: {}, i: {}, j: {}, pixel value : {:?}",
-        //     u, v, i, j, pixel.0
-        // );
+
         let color_scale = 1.0 / 255.0;
         Color::from(
             color_scale * pixel.0[0] as f64,
             color_scale * pixel.0[1] as f64,
             color_scale * pixel.0[2] as f64,
         )
+    }
+}
+
+pub struct NoiseTexture {
+    noise: Perlin,
+    scale: f64,
+}
+
+impl NoiseTexture {
+    pub fn new() -> Self {
+        Self {
+            noise: Perlin::new(256),
+            scale: 1.0,
+        }
+    }
+    pub fn from(point_count: i32, scale: f64) -> Self {
+        Self {
+            noise: Perlin::new(point_count),
+            scale,
+        }
+    }
+}
+
+impl Default for NoiseTexture {
+    fn default() -> Self {
+        Self {
+            noise: Perlin::new(256),
+            scale: 1.0,
+        }
+    }
+}
+
+impl Texture for NoiseTexture {
+    fn value(&self, _: f64, _: f64, p: &Point3) -> Color {
+        let s = *p * self.scale;
+        Color::ones() * 0.5 * (1.0 + (s.z() + 10.0 * self.noise.turb(s, 7)).sin())
     }
 }
