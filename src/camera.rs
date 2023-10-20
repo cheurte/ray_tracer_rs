@@ -1,7 +1,6 @@
 use crate::color::{write_colors, Color};
 use crate::hittable::{HitRecord, Hittable};
 use crate::interval::Interval;
-use crate::material::{Dielectric, Lambertian, Material, Metal};
 use crate::ray::Ray;
 use crate::rtweekend::{degrees2radians, random_double, INF};
 use crate::vec3::{Point3, Vec3};
@@ -19,6 +18,7 @@ pub struct Camera {
     pub vup: Vec3,        // Camera-relative "up" direction
     pub defocus_angle: f64,
     pub focus_dist: f64,
+    pub backround: Color,
     image_height: i32,
     pixel00_loc: Point3,
     pixel_delta_u: Vec3,
@@ -43,6 +43,7 @@ impl Camera {
         vup: Vec3,
         defocus_angle: f64,
         focus_dist: f64,
+        backround: Color,
     ) -> Self {
         Self {
             aspect_ratio,
@@ -55,6 +56,7 @@ impl Camera {
             vup,
             defocus_angle,
             focus_dist,
+            backround,
             image_height: 0,
             camera_center: Point3::zeros(),
             pixel00_loc: Point3::zeros(),
@@ -78,7 +80,7 @@ impl Camera {
 
                 for _ in 0..self.samples_per_pixel {
                     let r = self.get_ray(i, j);
-                    pixel_color += Camera::ray_color(&r, self.max_depth, world);
+                    pixel_color += Camera::ray_color(&self, &r, self.max_depth, world);
                 }
                 write_colors(pixel_color, self.samples_per_pixel);
             }
@@ -125,29 +127,24 @@ impl Camera {
         self.defocus_disk_v = self.v * defocus_radius;
     }
 
-    fn ray_color<T: Hittable>(r: &Ray, depth: i32, world: &T) -> Color {
+    fn ray_color<T: Hittable>(&self, r: &Ray, depth: i32, world: &T) -> Color {
         let mut rec = HitRecord::new();
         if depth <= 0 {
             return Color::zeros();
         }
 
-        if world.hit(r, Interval::from(0.001, INF), &mut rec) {
-            let mut scattered = Ray::new();
-            let mut attenuation = Color::ones();
-            // let material: Box<dyn Material> = match rec.mat {
-            //     ::Lambertian(color) => Box::new(Lambertian::new(color)),
-            //     Materials::Metal(color, fuzz) => Box::new(Metal::new(color, fuzz)),
-            //     Materials::Dielectric(ir) => Box::new(Dielectric::new(ir)),
-            // };
-
-            if rec.mat.scatter(r, &rec, &mut attenuation, &mut scattered) {
-                return attenuation * Camera::ray_color(&scattered, depth - 1, world);
-            }
-            return Color::zeros();
+        if !world.hit(r, Interval::from(0.001, INF), &mut rec) {
+            return self.backround;
         }
-        let unit_direction = r.direction().unit_vector();
-        let a = 0.5 * (unit_direction.y() + 1.0);
-        Color::ones() * (1.0 - a) + Color::from(0.5, 0.7, 1.0) * a
+        let mut scattered = Ray::new();
+        let mut attenuation = Color::ones();
+        let color_from_emission = rec.mat.emitted(rec.u, rec.v, &rec.p);
+        if !rec.mat.scatter(r, &rec, &mut attenuation, &mut scattered) {
+            return color_from_emission;
+        }
+
+        let color_from_scatter = attenuation * self.ray_color(&scattered, depth - 1, world);
+        color_from_emission + color_from_scatter
     }
 
     fn get_ray(&self, i: i32, j: i32) -> Ray {
@@ -189,6 +186,7 @@ impl Default for Camera {
             vup: Vec3::Y(false),
             defocus_angle: 0.0,
             focus_dist: 10.0,
+            backround: Color::from(0.7, 0.8, 1.0),
             image_height: 0,
             pixel00_loc: Point3::zeros(),
             pixel_delta_u: Point3::zeros(),

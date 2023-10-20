@@ -1,4 +1,5 @@
 use crate::rtweekend::INF;
+use std::ops;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Interval {
@@ -64,5 +65,12 @@ impl Interval {
     }
 }
 
-const UNIVERSE: Interval = Interval::from(-INF, INF);
+impl ops::Add<f64> for Interval {
+    type Output = Interval;
+    fn add(self, rhs: f64) -> Self::Output {
+        Interval::from(self.min + rhs, self.max + rhs)
+    }
+}
+
+pub const UNIVERSE: Interval = Interval::from(-INF, INF);
 const EMPTY: Interval = Interval::from(INF, -INF);

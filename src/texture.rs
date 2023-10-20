@@ -140,6 +140,12 @@ impl NoiseTexture {
             scale,
         }
     }
+    pub fn from_default(scale: f64) -> Self {
+        Self {
+            noise: Perlin::new(256),
+            scale,
+        }
+    }
 }
 
 impl Default for NoiseTexture {

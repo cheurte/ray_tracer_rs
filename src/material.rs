@@ -1,5 +1,6 @@
 use crate::rtweekend::random_double;
 use crate::texture::{SolidColor, Texture};
+use crate::vec3::Point3;
 use crate::{color::Color, hittable::HitRecord, ray::Ray, vec3::Vec3};
 use std::rc::Rc;
 
@@ -11,6 +12,10 @@ pub trait Material {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool;
+
+    fn emitted(&self, u: f64, v: f64, p: &Point3) -> Color {
+        Color::zeros()
+    }
 }
 
 // #[derive(Debug, Clone, Copy)]
@@ -128,6 +133,70 @@ impl Material for Dielectric {
             };
 
         *scattered = Ray::from(rec.p, direction, r_in.time());
+
+        true
+    }
+}
+
+pub struct DiffuseLight {
+    emit: Rc<dyn Texture>,
+}
+
+impl DiffuseLight {
+    pub fn from_material(emit: Rc<dyn Texture>) -> Self {
+        Self { emit }
+    }
+    pub fn from_color(color: Color) -> Self {
+        Self {
+            emit: Rc::new(SolidColor::from_color(color)),
+        }
+    }
+    // pub fn emitted(self, u: f64, v: f64, p: &Point3) -> Color {
+    //     self.emit.value(u, v, p)
+    // }
+}
+
+impl Material for DiffuseLight {
+    fn scatter(
+        &self,
+        r_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool {
+        false
+    }
+
+    fn emitted(&self, u: f64, v: f64, p: &Point3) -> Color {
+        self.emit.value(u, v, p)
+    }
+}
+
+pub struct Isotropic {
+    albedo: Rc<dyn Texture>,
+}
+
+impl Isotropic {
+    pub fn from_color(color: Color) -> Self {
+        Self {
+            albedo: Rc::new(SolidColor::from_color(color)),
+        }
+    }
+    pub fn from_texture(texture: Rc<dyn Texture>) -> Self {
+        Self { albedo: texture }
+    }
+}
+
+impl Material for Isotropic {
+    fn scatter(
+        &self,
+        r_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool {
+        *scattered = Ray::from(rec.p, Vec3::random_unit_vector(), r_in.time());
+        *attenuation = self.albedo.value(rec.u, rec.v, &rec.p);
 
         true
     }

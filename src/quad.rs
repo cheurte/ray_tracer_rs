@@ -1,6 +1,7 @@
 use crate::{
     aabb::Aabb,
     hittable::{HitRecord, Hittable},
+    hittable_list::HittableList,
     interval::Interval,
     material::Material,
     ray::Ray,
@@ -42,7 +43,7 @@ impl Quad {
     pub fn is_interior(a: f64, b: f64, rec: &mut HitRecord) -> bool {
         // Given the hit point in plane coordinates, return false if it is outside the
         // primitive, otherwise set the hit record UV coordinates and return true.
-        if (a < 0.0 || 1.0 < a || b < 0.0 || 1.0 < b) {
+        if a < 0.0 || 1.0 < a || b < 0.0 || 1.0 < b {
             return false;
         }
         rec.u = a;
@@ -81,4 +82,54 @@ impl Hittable for Quad {
     fn bounding_box(&self) -> Aabb {
         self.bbox
     }
+}
+
+pub fn box_volume(a: Point3, b: Point3, mat: Rc<dyn Material>) -> HittableList {
+    let mut sides = HittableList::new();
+
+    let min = Point3::from(a.x().min(b.x()), a.y().min(b.y()), a.z().min(b.z()));
+    let max = Point3::from(a.x().max(b.x()), a.y().max(b.y()), a.z().max(b.z()));
+
+    let dx = Vec3::from(max.x() - min.x(), 0.0, 0.0);
+    let dy = Vec3::from(0.0, max.y() - min.y(), 0.0);
+    let dz = Vec3::from(0.0, 0.0, max.z() - min.z());
+
+    sides.add(Rc::new(Quad::from(
+        Point3::from(min.x(), min.y(), max.z()),
+        dx,
+        dy,
+        mat.clone(),
+    )));
+    sides.add(Rc::new(Quad::from(
+        Point3::from(max.x(), min.y(), max.z()),
+        dz * -1.0,
+        dy,
+        mat.clone(),
+    )));
+    sides.add(Rc::new(Quad::from(
+        Point3::from(max.x(), min.y(), min.z()),
+        dx * -1.0,
+        dy,
+        mat.clone(),
+    )));
+    sides.add(Rc::new(Quad::from(
+        Point3::from(min.x(), min.y(), min.z()),
+        dz,
+        dy,
+        mat.clone(),
+    )));
+    sides.add(Rc::new(Quad::from(
+        Point3::from(min.x(), max.y(), max.z()),
+        dx,
+        dz * -1.0,
+        mat.clone(),
+    )));
+    sides.add(Rc::new(Quad::from(
+        Point3::from(min.x(), min.y(), min.z()),
+        dx,
+        dz,
+        mat.clone(),
+    )));
+
+    sides
 }

@@ -1,5 +1,5 @@
 use crate::rtweekend::{random_double, random_double_interval};
-use std::{cmp, fmt, ops};
+use std::{fmt, ops};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec3 {

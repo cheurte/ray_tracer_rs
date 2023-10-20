@@ -9,3 +9,6 @@ edition = "2021"
 image = "0.24.7"
 kdam = "0.3.0"
 rand = "0.8.5"
+
+[profile.release]
+opt-level = 3
