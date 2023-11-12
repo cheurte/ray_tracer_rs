@@ -13,12 +13,11 @@ pub trait Material {
         scattered: &mut Ray,
     ) -> bool;
 
-    fn emitted(&self, u: f64, v: f64, p: &Point3) -> Color {
+    fn emitted(&self, _: f64, _: f64, _: &Point3) -> Color {
         Color::zeros()
     }
 }
 
-// #[derive(Debug, Clone, Copy)]
 pub struct Lambertian {
     albedo: Rc<dyn Texture>,
 }
@@ -157,13 +156,7 @@ impl DiffuseLight {
 }
 
 impl Material for DiffuseLight {
-    fn scatter(
-        &self,
-        r_in: &Ray,
-        rec: &HitRecord,
-        attenuation: &mut Color,
-        scattered: &mut Ray,
-    ) -> bool {
+    fn scatter(&self, _: &Ray, _: &HitRecord, _: &mut Color, _: &mut Ray) -> bool {
         false
     }
 

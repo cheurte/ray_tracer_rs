@@ -612,7 +612,7 @@ fn final_scene(image_width: i32, samples_per_pixel: i32, max_depth: i32) {
 }
 
 fn main() {
-    let choice = 9;
+    let choice = 19;
     match choice {
         0 => random_sphere(),
         1 => earth(),
